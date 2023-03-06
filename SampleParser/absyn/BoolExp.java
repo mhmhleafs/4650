@@ -1,12 +1,12 @@
 package absyn;
 
-public class ReadExp extends Exp {
-  public VarExp input;
+public class BoolExp extends Exp {
+  public boolean value;
 
-  public ReadExp( int row, int col, VarExp input ) {
+  public BoolExp( int row, int col, boolean value ) {
     this.row = row;
     this.col = col;
-    this.input = input;
+    this.value = value;
   }
 
   public void accept( AbsynVisitor visitor, int level ) {
