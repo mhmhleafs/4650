@@ -86,8 +86,11 @@ number = {digit}+
    Z, a and z, or an underscore followed by zero or more letters
    between A and Z, a and z, zero and nine, or an underscore. */
 identifier = [_a-zA-Z][_a-zA-Z0-9]*
+punc = (\,\<\.\>\/\?\;\:\'\"\|\[\{\]\}=\+\-\_\)\(\*\&\^\%\$\#\@\!\~\`\)\]\'\))
 
 truth = false|true
+
+comment = ((\/\*)({identifier}|{punc}|{number}|{WhiteSpace})*(\*\/))
 
 %%
 /* ------------------------Lexical Rules Section---------------------- */
@@ -106,7 +109,6 @@ truth = false|true
 "while"            { return symbol(sym.WHILE); }
 "true"             { return symbol(sym.TRUE); }
 "false"            { return symbol(sym.FALSE); }
-":="               { return symbol(sym.ASSIGN); }
 "="                { return symbol(sym.EQ); }
 "<"                { return symbol(sym.LT); }
 ">"                { return symbol(sym.GT); }
@@ -133,5 +135,5 @@ truth = false|true
 {identifier}       { return symbol(sym.ID, yytext()); }
 {truth}            { return symbol(sym.TRUTH, yytext()); }
 {WhiteSpace}+      { /* skip whitespace */ }
-""       { /* skip comments */ }
+{comment}          { return symbol(sym.COM, yytext()); }
 .                  { return symbol(sym.ERROR); }
