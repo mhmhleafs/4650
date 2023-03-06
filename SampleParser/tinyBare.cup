@@ -73,12 +73,17 @@ terminal ASSIGN, EQ, LT, GT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI;
 terminal ID, NUM;
 terminal ERROR;
    
-non terminal program;
+non terminal program, exp;
 
 /* ----------------------------Grammar Section-------------------- */
    
 start with program;
 
 
-program	     ::= ;
+program	     ::= exp:e 
+                 {: RESULT = e; :}
+                ;
 
+exp	     ::= IF:e 
+                 {: RESULT = e; :}
+                ;
