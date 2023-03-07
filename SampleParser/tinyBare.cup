@@ -68,17 +68,53 @@ parser code {:
 
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
 
-terminal IF, ELSE, BOOL, INT, RETURN, VOID, WHILE, FALSE, TRUE;
+terminal IF, ELSE, INT, RETURN, VOID, WHILE, FALSE, TRUE;
 terminal EQ, LT, GT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI;
 terminal LBRACE, RBRACE, LBRACK, RBRACK, LTEQ, GTEQ, EQT, NEQT, TILDE;
 terminal OR, AND, COMMA;
-terminal String ID, NUM, TRUTH, COM;
+terminal String ID, COM;
+terminal Integer NUM;
+terminal Boolean BOOL, TRUTH;
+terminal String;
+terminal UMINUS;
 terminal ERROR;
 
-non terminal program;
+
+non terminal DecList program;
+non terminal Dec declaration;
+non terminal Dec fun_prototype;
+non terminal ExpList statement_list;
+non terminal Exp statement;
+non terminal Exp expression_stmt, selection_stmt, iteration_stmt, return_stmt;
+non terminal Exp expression;
+non terminal ExpList arg_list;
+non terminal ExpList args;
+non terminal Exp call, factor, signed_factor;
+
+//probably exp
+non terminal Exp ubool_expression, abool_expression, obool_expression, additive_expression, simple_expression;
+non terminal Exp term;
+
+//maybe?
+non terminal Integer relop;
+
+//unsure
+non terminal Integer mulop, addop;
+non terminal DecList declaration_list;
+non terminal Dec fun_declaration;
+non terminal NameTy type_specifier;
+//sure
+non terminal VarDecList params, param_list, local_declarations;
+non terminal VarDec var_declaration, param;
+non terminal CompoundExp compound_stmt;
+non terminal Var var;
 
 /* -- precedence and associativity declarations -- */
-precedence left EQ, LT, GT, PLUS, MINUS, TIMES, OVER, LPAREN, RPAREN, SEMI; //is this right?
+precedence left PLUS, MINUS;
+precedence left TIMES, OVER; //is this right?
+precedence left error;
+precedence right ELSE;
+precedence right UMINUS;
 
 /* ----------------------------Grammar Section-------------------- */
 
@@ -86,218 +122,359 @@ start with program;
 
 
 program	     ::= declaration_list:d 
-               {:  :}
+               {: RESULT = d; :}
                ;
 
 declaration_list ::= declaration_list:d1 declaration:d2
-               {:  :}
-               | declaration
-               {:  :}
+               {: 
+                  if(d1 == null)
+                     RESULT = new DecList(d2, d1);
+                  else
+                  {
+                     DecList t = d1;
+                     while(t.tail != null)
+                        t = t.tail;
+                     t.tail = new DecList(d2, null);
+                     RESULT = d1; 
+                  }
+               :}
+               | declaration:d
+               {: RESULT = new DecList(d, null); :}
                ;
 
 declaration ::= var_declaration:v
-               {:  :}
+               {: RESULT = v   ; :}
                | fun_declaration:f
-               {:  :}
+               {: RESULT = f   ; :}
                | fun_prototype:f
-               {:  :}
+               {: RESULT = f   ; :}
                ;
 
-var_declaration ::= type_specifier:t ID SEMI
-               {:  :}
-               | type_specifier:t ID LBRACK NUM RBRACK SEMI
-               {:  :}
+var_declaration ::= type_specifier:t ID:i SEMI
+               {: RESULT = new SimpleDec(tleft, tright, t, i); :}
+               | type_specifier:t ID:i LBRACK NUM:n RBRACK SEMI
+               {: RESULT = new ArrayDec(tleft, tright, t, i, n); :}
+               | type_specifier:t error:e LBRACK NUM:n RBRACK SEMI
+               {:
+                  RESULT = new ArrayDec(eleft, eright, t, "", n);
+                  parser.report_error("_Invalid Array Declaration at @ row:"+ (eleft + 1) + ", col:" + eright, e);
+               :}
+               | type_specifier:t error:e SEMI
+               {:
+                  RESULT = new SimpleDec(eleft, eright, t, "");
+                  parser.report_error("_Invalid Simple Declaration @ row:"+ (eleft + 1) + ", col:" + eright, e);
+               :}
                ;
 
-type_specifier ::= BOOL
-               {:  :}
-               | INT
-               {:  :}
-               | VOID
-               {:  :}
+type_specifier ::= BOOL:b
+               {: RESULT = new NameTy(bleft, bright, NameTy.BOOL); :}
+               | INT:i
+               {: RESULT = new NameTy(ileft, iright, NameTy.INT); :}
+               | VOID:v
+               {: RESULT = new NameTy(vleft, vright, NameTy.VOID); :}
                ;
 
-fun_declaration ::= type_specifier:t ID LPAREN params:p RPAREN compound_stmt:c
-               {:  :}
+fun_declaration ::= type_specifier:t ID:i LPAREN params:p RPAREN compound_stmt:c
+               {:
+                  RESULT = new FunctionDec(tleft, tright, t, i, p, c);
+               :}
+               | error:e ID:i LPAREN params:p RPAREN compound_stmt:c
+               {:
+                  parser.report_error("_Invalid Function Type Declaration at @ row:"+ (ileft + 1) + ", col:" + iright, e);
+                  RESULT = new FunctionDec(eleft, eright, new NameTy(cleft, eright, NameTy.ERROR), i, p, c);
+               :}
                ;
 
-fun_prototype ::= type_specifier:t ID LPAREN params:p RPAREN SEMI
-               {:  :}
+fun_prototype ::= type_specifier:t ID:i LPAREN params:p RPAREN SEMI
+               {: RESULT = new FunctionDec(tleft, tright, t, i, p, new NilExp(tleft, tright)); :}
+               | error:e ID:i LPAREN params:p RPAREN SEMI
+               {: 
+               parser.report_error("_Invalid type on function_prototype @ row: "+ (ileft + 1) + ", col: " + eright, e);
+               RESULT = new FunctionDec(eleft, eright, new NameTy(eleft, eright, NameTy.ERROR), i, p, new NilExp(eleft, eright)); :}
                ;
 
 params ::= param_list:p
-         {:  :}
-         | VOID
-         {:  :}
+         {: 
+            RESULT = p;
+         :}
+         | VOID:v
          ;
 
 param_list ::= param_list:p1 COMMA param:p2
-               {:  :}
+               {: if(p1 == null)
+                     RESULT = new VarDecList(p2, p1);
+                  else{
+                     VarDecList t = p1;
+                     while(t.tail != null)
+                        t = t.tail;
+                     t.tail = new VarDecList(p2, null);
+                     RESULT = p1; 
+                  }
+               :}
+               | error:e COMMA param:p2
+               {:
+                  parser.report_error("_Invalid parameter list @ row: "+ (p2left + 1) + ", col: " + eright, e);
+                  SimpleDec t = new SimpleDec(eleft, eright, new NameTy(eleft, eright, NameTy.ERROR), "ERROR");
+                  
+                  RESULT = new VarDecList(t, null);
+               :}
                | param:p
-               {:  :}
+               {: RESULT = new VarDecList(p, null); :}
                ;
 
-param ::= type_specifier:t ID
-         {:  :}
-         | type_specifier:t ID LBRACK RBRACK
+param ::= type_specifier:t ID:i
+         {: RESULT = new SimpleDec(tleft, tright, t, i); :}
+         | type_specifier:t ID:i LBRACK RBRACK
+         {: RESULT = new SimpleDec(tleft, tright, t, i); :}
+         | type_specifier:t error:e
+         {:
+            parser.report_error("_Invalid single parameter ID @ row: "+ (tleft + 1) + ", col: " + eright, e);
+            RESULT = new SimpleDec(tleft, tright, t, "ERROR");
+         :}
+         | error:e ID:i
+         {:
+            parser.report_error("_Invalid single parameter type @ row: "+ (ileft + 1) + ", col: " + iright, e);
+            RESULT = new SimpleDec(ileft, iright, new NameTy(eleft, eright, NameTy.ERROR), i);
+         :}
+         ;
 
-compound_stmt ::= LBRACE local_declarations:l statement_list:s RBRACE
-         {:  :}
+compound_stmt ::= LBRACE:l1 local_declarations:l2 statement_list:s RBRACE
+         {: 
+            RESULT = new CompoundExp(l1left, l1right, l2, s);
+         :}
          ;
 
 local_declarations ::= local_declarations:l var_declaration:v
-                     {:  :}
+                     {: 
+                        if(l == null)
+                           RESULT = new VarDecList(v, l);
+                        else
+                        {
+                           VarDecList t = l;
+                           while(t.tail != null)
+                              t = t.tail;
+                           t.tail = new VarDecList(v, null);
+                           RESULT = l; 
+                        }
+                     :}
                      |
                      ;
 
 statement_list ::= statement_list:s1 statement:s2
-         {:  :}
+         {: 
+            if(s1 == null)
+               RESULT = new ExpList(s2, s1);
+            else
+            {
+               ExpList t = s1;
+               while( t.tail != null )
+                  t = t.tail;
+               t.tail = new ExpList(s2, null);
+               RESULT = s1; 
+            }
+         :}
          |
          ;
 
 
 statement ::= expression_stmt:e
-            {:  :}
+            {: RESULT = e; :}
             | compound_stmt:c
-            {:  :}
+            {: RESULT = c; :}
             | selection_stmt:s
-            {:  :}
+            {: RESULT = s; :}
             | iteration_stmt:i
-            {:  :}
+            {: RESULT = i; :}
             | return_stmt:r
-            {:  :}
+            {: RESULT = r; :}
             ;
 
 expression_stmt ::= expression:e SEMI 
-            {:  :}
+            {: RESULT = e; :}
             | SEMI
-            {:  :}
             ;
 
 selection_stmt ::= IF:i LPAREN expression:e RPAREN statement:s
-               {:  :}
+               {: 
+                  RESULT = new IfExp(ileft, iright, e, s, new NilExp(ileft, iright));
+               :}
                | IF:i LPAREN expression:e RPAREN statement:s1 ELSE statement:s2
-               {:  :}
+               {: RESULT = new IfExp(ileft, iright, e, s1, s2); :}
                ;
 
 iteration_stmt ::= WHILE:w LPAREN expression:e RPAREN statement:s
-            {:  :}
+            {: RESULT = new WhileExp(wleft, wright, e, s); :}
             ;
 
 return_stmt ::= RETURN:r expression:e SEMI
-            {:  :}
+            {: 
+               RESULT = new ReturnExp(rleft, rright, e);
+            :}
             | RETURN:r SEMI
-            {:  :}
+            {: 
+               RESULT = new ReturnExp(rleft, rright, new NilExp(rleft, rright));
+            :}
             ;
 
 expression ::= var:v EQ expression:e
-            {:  :}
-            | obool_expression
-            {:  :}
+            {: VarExp t = new VarExp(vleft, vright, v);
+               RESULT = new AssignExp(vleft, vright, t, e); :}
+            | obool_expression:o
+            {: RESULT = o; :}
+            | var:v EQ error:e
+            {:
+               parser.report_error("_Invalid expression on RHS of '=' @ row: "+ (vleft + 1) + ", col: " + eright, e);
+               VarExp t = new VarExp(vleft, vright, v);
+               RESULT = new AssignExp(vleft, vright, t, new NilExp(eleft, eright));
+            :}
+            | error:e1 EQ expression:e2
+            {: parser.report_error("_Invalid expression on LHS of '=' @ row: "+ (e2left + 1) + ", col: " + e1right, e1);
+               SimpleVar v = new SimpleVar(e1left, e1right, "ID_ERROR");
+               VarExp t = new VarExp(e1left, e1right, v);
+               RESULT = new AssignExp(e1left, e1right, t, e2);
+            :}
             ;
 
-var ::= ID
-      {:  :}
-      | ID LBRACK expression RBRACK
-      {:  :}
+var ::= ID:i
+      {: RESULT = new SimpleVar(ileft, iright, i); :}
+      | ID:i LBRACK expression:e RBRACK
+      {: RESULT = new IndexVar(ileft, iright, i, e); :}
       ;
 
 obool_expression ::= obool_expression:o OR abool_expression:a
-            {:  :}
+            {:
+               RESULT = new OpExp(oleft, oright, o, OpExp.OR, a);
+            :}
             | abool_expression:a
-            {:  :}
+            {: RESULT = a; :}
             ;
 
 abool_expression ::= abool_expression:a AND ubool_expression:u
-            {:  :}
+            {: 
+               RESULT = new OpExp(aleft, aright, a, OpExp.AND, u);
+            :}
             | ubool_expression:u
-            {:  :}
+            {: 
+               RESULT = u;
+            :}
             ;
 
-ubool_expression ::= NOT ubool_expression:u
-                  {:  :}
+ubool_expression ::= TILDE:t ubool_expression:u
+                  {: RESULT = new OpExp(tleft, tright, new NilExp(tleft, tright), OpExp.NOT, u); :}
                   | simple_expression:s
-                  {:  :}
+                  {: RESULT = s; :}
                   ;
 
 simple_expression ::= additive_expression:a1 relop:r additive_expression:a2
-            {:  :}
+            {: 
+               RESULT = new OpExp(a1left, a1right, a1, r, a2);
+            :}
             | additive_expression:a
-            {:  :}
+            {: 
+               RESULT = a;
+            :}
             ;
 
 
 relop ::= LTEQ
-      {:  :}
+      {: RESULT = OpExp.LE; :}
       | LT
-      {:  :}
+      {: RESULT = OpExp.LT; :}
       | GT
-      {:  :}
+      {: RESULT = OpExp.GT; :}
       | GTEQ
-      {:  :}
+      {: RESULT = OpExp.GE; :}
       | EQT
-      {:  :}
+      {: RESULT = OpExp.EQ; :}
       | NEQT
-      {:  :}
+      {: RESULT = OpExp.NE; :}
       ;
 
 additive_expression ::= additive_expression:a1 addop:a2 term:t
-            {:  :}
+            {: RESULT = new OpExp(a1left, a1right, a1, a2, t); :}
             | term:t
-            {:  :}
+            {: RESULT = t; :}
+            | error:e addop:a2 term:t
+            {:
+               parser.report_error("_Invalid additive expression on LHS of '+/-' @ row: "+ (tleft + 1) + ", col: " + tright, e);
+               RESULT = new OpExp(eleft, eright, new NilExp(eleft, eright), a2, t);
+            :}
+            | additive_expression:a1 addop:a2 error:e
+            {: 
+               parser.report_error("_Invalid term on RHS of '+/-' @ row: "+ (a1left + 1) + ", col: " + a1right, e);
+               RESULT = new OpExp(eleft, eright, a1, a2, new NilExp(eleft, eright));
+            :}
             ;
 
 addop ::= PLUS
-      {:  :}
+      {: RESULT = OpExp.PLUS; :}
       | MINUS
-      {:  :}
+      {: RESULT = OpExp.MINUS; :}
       ;
 
 term ::= term:t mulop:m signed_factor:s
-      {:  :}
+      {:
+         RESULT = new OpExp(tleft, tright, t, m, s);
+      :}
       | signed_factor:s
-      {:  :}
+      {:
+         RESULT = s;
+      :}
       ;
 
 mulop ::= TIMES:t
-            {:  :}
+            {: RESULT = OpExp.MUL; :}
             | OVER:o
-            {:  :}
+            {: RESULT = OpExp.DIV; :}
             ;
 
 
-signed_factor ::= MINUS signed_factor:s
-               {:  :}
+signed_factor ::= MINUS:m signed_factor:s
+               {: RESULT = new OpExp(mleft, mright, new NilExp(mleft, mright), OpExp.UMINUS, s); :}
                | factor:f
-               {:  :}
+               {: RESULT = f; :}
                ;
 
 factor ::= LPAREN expression:e RPAREN
-               {:  :}
+               {:
+               //?
+                  RESULT = e;
+               :}
                | var:v
-               {:  :}
+               {: RESULT = new VarExp(vleft, vright, v); :}
                | call:c
-               {:  :}
+               {: RESULT = c; :}
                | NUM:n
-               {:  :}
+               {: RESULT = new IntExp(nleft, nright, n); :}
                | TRUTH:t
-               {:  :}
+               {: RESULT = new BoolExp(tleft, tright, t); :}
                ;
 
 
-call ::= ID LPAREN args:a RPAREN
-      {:  :}
+call ::= ID:i LPAREN args:a RPAREN
+      {: RESULT = new CallExp(ileft, iright, i, a); :}
       ;
 
 args ::= arg_list:a
-      {:  :}
+      {: RESULT = a; :}
       |
       ;
       
 arg_list ::= arg_list:a COMMA expression:e
-         {:  :}
+         {: 
+            if(a == null)
+               RESULT = new ExpList(e, a);
+            else
+            {
+               ExpList t = a;
+               while(t.tail != null)
+                  t = t.tail;
+               t.tail = new ExpList(e, null);
+               RESULT = a; 
+            }
+         :}
          | expression:e
-         {:  :}
+         {: RESULT = new ExpList(e, null); :}
          ;
 
 

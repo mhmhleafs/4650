@@ -1,16 +1,20 @@
-/* A factorial program that uses a Boolean variable */
+/*
+Error 1: Invalid addition expression (Invalid Expression ON RHS of =)
+Error 2: Invalid addition expression (Invalid RHS of addop "1:")
+*/
 
 void main(void) {
   int x; 
   int fac;
   bool test;
+  test = +; /* error 1 */
 
   x = input();
   fac = 1;
   test = x > 1;
   while (test) {
     fac = fac * x;
-    x = x - 1;
+    x = x - 1:; /* error 2 */
     test = x > 1;
   } 
 

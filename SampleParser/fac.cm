@@ -1,9 +1,11 @@
-/* A program to compute the factorial value of an integer */
+/*
+Error 1: invalid parameter list (invalid parameter syntax)
+Error 2: invalid individual parameter (invalid ID syntax)
+*/
 
-void main(void) {
+void main(void main(), int b) { /* error 1 */
   int x;
   int fac;
-
   x = input();
   fac = 1;
   while (x > 1) {
@@ -12,4 +14,8 @@ void main(void) {
   }
 
   output(fac);
+}
+
+void main2(int main2()){ /* error 2 */
+  int s;
 }

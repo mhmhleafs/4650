@@ -1,14 +1,18 @@
-/* A program to perform Euclid's algorithm to
-   compute the greatest common divisor called gcd */
+/*
+Error 1: Invalid additive expression (Invalid ID "z:")
+Error 2: Invalid assignment operation (Invalid ID "z:z")
+*/
 
 int gcd(int u, int v) {
   if (v == 0) return u;
   else return gcd(v, u - u/v*v);
 }
 
-void main(void) {
+void main(void x) {
   int x;  
-  int y;
+  z: + y; /* error 1 */
+
+  z:z = 6; /* error 2 */
 
   x = input();
   y = input();

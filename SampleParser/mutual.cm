@@ -1,28 +1,19 @@
-/* A program that contains mutual recursions */
+/*
+Error 1: Invalid function type (Invalid NameTy "crint")
+Error 2: Invalid simple declaration (Expect ; or [] after [Type][ID])
+Error 3: Invalid single parameter (invalid parameter type)
+Error 4: Invalid assignment expression (invalid ID after =)
+*/
 
-int x;
-int y;
+crint func(int a); /* error 1*/
 
-void g(int n);    /* prototype for mutual recursions */
+ int fn(int e) {
 
-void f(int n) {
-   g(n);
-   y = y - 1;
-}
+  int x = 6; /* error 2 */
+  x = 5;
+ }
 
-void g(int m) {
-  m = m - 1;
-  if (m > 0) {
-     f(m);
-     y = y - 1;
-     g(m);
-  }
-}
-
-int main(void) {
-  x = input();
-  y = input();
-  g(x);
-  output(x);
-  output(y);
+int fd(crint c) { /* error 3 */
+  int six;
+   six = **6; /* error 4 */
 }

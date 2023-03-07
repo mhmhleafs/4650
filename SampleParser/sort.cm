@@ -1,5 +1,8 @@
-/* A program to perform selection sort on an array of
-   10 integers */
+/* This one works fully
+Don't touch
+
+Expected errors: 0
+ */
 
 int x[10];
 

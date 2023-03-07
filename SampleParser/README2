@@ -1,0 +1,20 @@
+A parser implementation for the C- programming language using JFlex and CUP
+
+This project was made from building off the files provied in C1-Package.tgz
+
+to build the program:
+    make
+
+to clean the directory (including deleting .abs files):
+    make clean
+
+to run the program with AST output:
+    java -cp /usr/share/java/cup.jar:. Main filename.cm -a
+        -where "/usr/share/java/cup.jar" is replaces with your filepath to cup.jar
+        -and "filename.cm" is replaces with the name of the C- file you want to build from
+    A file called "filename.abs" will be created with the output
+
+to run the program without AST output:
+    java -cp /usr/share/java/cup.jar:. Main filename.cm
+        -where "/usr/share/java/cup.jar" is replaces with your filepath to cup.jar
+        -and "filename.cm" is replaces with the name of the C- file you want to build from
