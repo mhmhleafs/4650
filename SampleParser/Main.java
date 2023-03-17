@@ -17,6 +17,7 @@ import absyn.*;
 class Main {
   public final static boolean SHOW_TREE = true;
   public static boolean AFLAG = false;
+  public static boolean SFLAG = false;
   static public void main(String argv[]) {    
     for (String s: argv)
     {
@@ -25,6 +26,12 @@ class Main {
       {
         //System.out.println("  valid");
         AFLAG = true;
+      }
+      if(s.equals("-s"))
+      {
+        //System.out.println("  valid");
+        AFLAG = true;
+        SFLAG = true;
       }
     }
     /* Start the parser */
@@ -42,6 +49,25 @@ class Main {
          result.accept(visitor, 0);
          visitor.myWriter.close();
          temp.close();
+      }
+      if (SHOW_TREE && result != null && SFLAG)
+      {
+        System.out.println("SFLAG IS TRUE");
+        System.out.println("The symbol tree is:");
+        
+        SemanticAnalyzer visitor = new SemanticAnalyzer();
+        
+        String filename = argv[0].replace(".cm", ".sym");
+        System.out.println(filename);
+        
+        File outFile = new File(filename); //creates xx.sym
+        FileWriter temp = new FileWriter(filename); //creates a file writer
+        
+        visitor.myWriter = temp;
+        result.accept(visitor, 0);
+        visitor.myWriter.close();
+        
+        temp.close();
       }
     } catch (Exception e) {
       /* do cleanup here -- possibly rethrow e */

@@ -1,0 +1,15 @@
+int i;
+int j;
+
+int f(int size) {
+  bool i;
+  bool temp;
+
+  if (i){
+    int k;
+  }
+}
+
+int pee(void) {
+  bool k;
+}

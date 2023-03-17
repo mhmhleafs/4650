@@ -1,21 +1,21 @@
 ArrayDec: x
     size: 10
-    NameTy: INT 
+    NameTy: INT
 FunctionDec: minloc
-    NameTy: INT 
+    NameTy: INT
     SimpleDec: a
-        NameTy: INT 
+        NameTy: INT
     SimpleDec: low
-        NameTy: INT 
+        NameTy: INT
     SimpleDec: high
-        NameTy: INT 
+        NameTy: INT
     CompoundExp: 
         SimpleDec: i
-            NameTy: INT 
+            NameTy: INT
         SimpleDec: x
-            NameTy: INT 
+            NameTy: INT
         SimpleDec: k
-            NameTy: INT 
+            NameTy: INT
         AssignExp: 
             SimpleVar: k
             SimpleVar: low
@@ -55,18 +55,18 @@ FunctionDec: minloc
         ReturnExp: 
             SimpleVar: k
 FunctionDec: sort
-    NameTy: VOID 
+    NameTy: VOID
     SimpleDec: a
-        NameTy: INT 
+        NameTy: INT
     SimpleDec: low
-        NameTy: INT 
+        NameTy: INT
     SimpleDec: high
-        NameTy: INT 
+        NameTy: INT
     CompoundExp: 
         SimpleDec: i
-            NameTy: INT 
+            NameTy: INT
         SimpleDec: k
-            NameTy: INT 
+            NameTy: INT
         AssignExp: 
             SimpleVar: i
             SimpleVar: low
@@ -78,7 +78,7 @@ FunctionDec: sort
                     IntExp: 1
             CompoundExp: 
                 SimpleDec: t
-                    NameTy: INT 
+                    NameTy: INT
                 AssignExp: 
                     SimpleVar: k
                     CallExp: minloc
@@ -104,10 +104,10 @@ FunctionDec: sort
                         SimpleVar: i
                         IntExp: 1
 FunctionDec: main
-    NameTy: VOID 
+    NameTy: VOID
     CompoundExp: 
         SimpleDec: i
-            NameTy: INT 
+            NameTy: INT
         AssignExp: 
             SimpleVar: i
             IntExp: 0

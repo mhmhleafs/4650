@@ -1,0 +1,24 @@
+SimpleDec: i
+    NameTy: INT 
+SimpleDec: j
+    NameTy: INT 
+FunctionDec: f
+    NameTy: INT 
+    SimpleDec: size
+        NameTy: INT 
+    CompoundExp: 
+        SimpleDec: i
+            NameTy: BOOL 
+        SimpleDec: temp
+            NameTy: BOOL 
+        IfExp: 
+            SimpleVar: i
+            CompoundExp: 
+                SimpleDec: k
+                    NameTy: INT 
+            NilExp: 
+FunctionDec: pee
+    NameTy: INT 
+    CompoundExp: 
+        SimpleDec: k
+            NameTy: BOOL 

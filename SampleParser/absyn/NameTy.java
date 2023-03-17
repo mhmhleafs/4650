@@ -14,6 +14,19 @@ public class NameTy extends Absyn {
         this.typ = typ;
     }
 
+    public String getType()
+    {
+        if(this.typ == 0)
+            return "BOOL";
+        else if(this.typ == 1)
+            return "INT";
+        else if(this.typ == 2)
+            return "VOID";
+        else if(this.typ == 3)
+            return "ERROR";
+        return "ERROR";
+    }
+
     public void accept( AbsynVisitor visitor, int level ) {
         visitor.visit( this, level );
     }
