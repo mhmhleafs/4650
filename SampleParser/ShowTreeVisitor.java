@@ -160,10 +160,13 @@ public class ShowTreeVisitor implements AbsynVisitor {
   public void visit( ArrayDec exp, int level ) {
     indent( level );
     try {
-      myWriter.write( "ArrayDec: " + exp.name + " " + exp.size + "\n");
-    
-} catch (IOException e)
-{
+      myWriter.write( "ArrayDec: " + exp.name + "\n" );
+      level++;
+      indent(level);
+      myWriter.write( "size: " + exp.size + "\n");
+      level -= 1;
+    } catch (IOException e)
+    {
       System.err.println("FileWrite Error");
     }
     level++;

@@ -1,12 +1,9 @@
-/* This one works fully
-Don't touch
-
-Expected errors: 0
- */
+/* A program to perform selection sort on an array of
+   10 integers */
 
 int x[10];
 
-int minloc(int a, int low, int high) {
+int minloc(int a[], int low, int high) {
   int i; 
   int x; 
   int k;

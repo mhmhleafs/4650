@@ -1,0 +1,147 @@
+ArrayDec: x
+    size: 10
+    NameTy: INT 
+FunctionDec: minloc
+    NameTy: INT 
+    SimpleDec: a
+        NameTy: INT 
+    SimpleDec: low
+        NameTy: INT 
+    SimpleDec: high
+        NameTy: INT 
+    CompoundExp: 
+        SimpleDec: i
+            NameTy: INT 
+        SimpleDec: x
+            NameTy: INT 
+        SimpleDec: k
+            NameTy: INT 
+        AssignExp: 
+            SimpleVar: k
+            SimpleVar: low
+        AssignExp: 
+            SimpleVar: x
+            IndexVar: a
+                SimpleVar: low
+        AssignExp: 
+            SimpleVar: i
+            OpExp: + 
+                SimpleVar: low
+                IntExp: 1
+        WhileExp: 
+            OpExp: < 
+                SimpleVar: i
+                SimpleVar: high
+            CompoundExp: 
+                IfExp: 
+                    OpExp: < 
+                        IndexVar: a
+                            SimpleVar: i
+                        SimpleVar: x
+                    CompoundExp: 
+                        AssignExp: 
+                            SimpleVar: x
+                            IndexVar: a
+                                SimpleVar: i
+                        AssignExp: 
+                            SimpleVar: k
+                            SimpleVar: i
+                    NilExp: 
+                AssignExp: 
+                    SimpleVar: i
+                    OpExp: + 
+                        SimpleVar: i
+                        IntExp: 1
+        ReturnExp: 
+            SimpleVar: k
+FunctionDec: sort
+    NameTy: VOID 
+    SimpleDec: a
+        NameTy: INT 
+    SimpleDec: low
+        NameTy: INT 
+    SimpleDec: high
+        NameTy: INT 
+    CompoundExp: 
+        SimpleDec: i
+            NameTy: INT 
+        SimpleDec: k
+            NameTy: INT 
+        AssignExp: 
+            SimpleVar: i
+            SimpleVar: low
+        WhileExp: 
+            OpExp: < 
+                SimpleVar: i
+                OpExp: - 
+                    SimpleVar: high
+                    IntExp: 1
+            CompoundExp: 
+                SimpleDec: t
+                    NameTy: INT 
+                AssignExp: 
+                    SimpleVar: k
+                    CallExp: minloc
+                        SimpleVar: a
+                        SimpleVar: i
+                        SimpleVar: high
+                AssignExp: 
+                    SimpleVar: t
+                    IndexVar: a
+                        SimpleVar: k
+                AssignExp: 
+                    IndexVar: a
+                        SimpleVar: k
+                    IndexVar: a
+                        SimpleVar: i
+                AssignExp: 
+                    IndexVar: a
+                        SimpleVar: i
+                    SimpleVar: t
+                AssignExp: 
+                    SimpleVar: i
+                    OpExp: + 
+                        SimpleVar: i
+                        IntExp: 1
+FunctionDec: main
+    NameTy: VOID 
+    CompoundExp: 
+        SimpleDec: i
+            NameTy: INT 
+        AssignExp: 
+            SimpleVar: i
+            IntExp: 0
+        WhileExp: 
+            OpExp: < 
+                SimpleVar: i
+                IntExp: 10
+            CompoundExp: 
+                AssignExp: 
+                    IndexVar: x
+                        SimpleVar: i
+                    CallExp: input
+                AssignExp: 
+                    SimpleVar: i
+                    OpExp: + 
+                        SimpleVar: i
+                        IntExp: 1
+        CallExp: sort
+            SimpleVar: x
+            IntExp: 0
+            IntExp: 10
+        AssignExp: 
+            SimpleVar: i
+            IntExp: 0
+        WhileExp: 
+            OpExp: < 
+                SimpleVar: i
+                IntExp: 10
+            CompoundExp: 
+                CallExp: output
+                    IndexVar: x
+                        SimpleVar: i
+                AssignExp: 
+                    SimpleVar: i
+                    OpExp: + 
+                        SimpleVar: i
+                        IntExp: 1
