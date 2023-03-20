@@ -3,9 +3,19 @@ int j;
 
 int f(int size) {
   bool i;
-  bool temp;
+  int temp;
+  int a[10];
 
-  if (i){
+  i = true;
+
+  i = ~((true && i) || false);
+
+  /*temp = a[5];
+  temp = z[5];
+  temp = a[i];*/
+
+
+  while (i < 5){
     int k;
   }
 }

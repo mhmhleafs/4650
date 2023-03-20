@@ -1,15 +1,16 @@
 Entering the global scope:
     Entering the scope for function f:
-        Entering the scope for IF block: 
+        Entering scope for WHILE block: 
             k x1, l: 3, t: INT
-        Leaving the scope for IF block.
-        temp x1, l: 2, t: BOOL
+Leaving scope for WHILE block.
+        a x1, l: 2, t: INT
+        temp x1, l: 2, t: INT
         size x1, l: 2, t: INT
         i x2, l: 2, t: BOOL
     Leaving the function scope.
     Entering the scope for function pee:
         k x1, l: 2, t: BOOL
-    Leaving the function scope
+    Leaving the function scope.
     pee x1, l: 1, t: INT
     f x1, l: 1, t: INT
     i x1, l: 1, t: INT

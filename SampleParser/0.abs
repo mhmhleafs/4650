@@ -10,13 +10,28 @@ FunctionDec: f
         SimpleDec: i
             NameTy: BOOL 
         SimpleDec: temp
-            NameTy: BOOL 
-        IfExp: 
+            NameTy: INT 
+        ArrayDec: a 10
+            NameTy: INT 
+        AssignExp: 
             SimpleVar: i
+            BoolExp: true
+        AssignExp: 
+            SimpleVar: i
+            OpExp: ~ 
+                NilExp: 
+                OpExp: || 
+                    OpExp: && 
+                        BoolExp: true
+                        SimpleVar: i
+                    BoolExp: false
+        WhileExp: 
+            OpExp: < 
+                SimpleVar: i
+                IntExp: 5
             CompoundExp: 
                 SimpleDec: k
                     NameTy: INT 
-            NilExp: 
 FunctionDec: pee
     NameTy: INT 
     CompoundExp: 

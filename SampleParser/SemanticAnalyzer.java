@@ -17,6 +17,128 @@ public class SemanticAnalyzer implements AbsynVisitor{
         }
     }
 
+    public void printDec(int level, String key){
+        try{
+            if(declarations.get(key).get(0).def instanceof SimpleDec)
+            {
+                SimpleDec simpleNode = (SimpleDec) declarations.get(key).get(0).def;
+                indent(level);
+                myWriter.write(simpleNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + simpleNode.typ.getType() + "\n");
+            }
+            else if(declarations.get(key).get(0).def instanceof ArrayDec)
+            {
+                ArrayDec arrayNode = (ArrayDec) declarations.get(key).get(0).def;
+                indent(level);
+                myWriter.write(arrayNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + arrayNode.typ.getType() + "\n");
+            }
+            else if(declarations.get(key).get(0).def instanceof FunctionDec)
+            {
+                FunctionDec functionNode = (FunctionDec) declarations.get(key).get(0).def;
+                indent(level);
+                myWriter.write(functionNode.func + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + functionNode.result.getType() + "\n");
+            }
+        } catch (IOException e){
+            System.err.println("FileWrite error");
+        }
+    }
+
+    public int expType(Exp exp)
+    {
+        if (exp instanceof NilExp)
+        {
+            return -1;
+        }
+        if (exp instanceof IntExp)
+        {
+            return type((IntExp) exp);
+        }
+        if (exp instanceof BoolExp)
+        {
+            return type((BoolExp) exp);
+        }
+        if (exp instanceof VarExp)
+        {
+            return type((VarExp) exp);
+        } 
+        if(exp instanceof CallExp)
+        {
+            return type((CallExp) exp);
+        }
+        if (exp instanceof OpExp)
+        {
+            return type((OpExp) exp);
+        }
+        if(exp instanceof AssignExp)
+        {
+            return type((AssignExp) exp);
+        }
+
+        return -1;
+    }
+
+    public int type(IntExp exp)
+    {
+        return NameTy.INT;
+    }
+
+    public int type(BoolExp exp){
+        return NameTy.BOOL;
+    }
+
+    public int type(CallExp exp)
+    {
+        FunctionDec temp = (FunctionDec) declarations.get(exp.func).get(0).def;
+        return temp.result.typ;
+    }
+
+    public int type(VarExp exp)
+    {
+        if(exp.variable instanceof SimpleVar)
+        {
+            SimpleVar temp = (SimpleVar) exp.variable;
+            if(declarations.containsKey(temp.name))
+            {
+                SimpleDec tempDec = (SimpleDec) declarations.get(temp.name).get(0).def;
+                return tempDec.typ.typ;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            IndexVar temp = (IndexVar) exp.variable;
+            if (declarations.containsKey(temp.name))
+            {
+                ArrayDec tempDec = (ArrayDec) declarations.get(temp.name).get(0).def;
+                return tempDec.typ.typ;
+            }
+
+            return -1;
+
+        }
+    }
+
+    public int type(AssignExp exp)
+    {
+        return type(exp.lhs);
+    }
+
+    public int type(OpExp exp)
+    {
+        if(exp.left instanceof NilExp)
+        {
+            return expType(exp.right);
+        }
+        else
+        {
+            return expType(exp.left);
+        }
+    }
+
+
+    /////////////////////////////////////////////////////////
     public void visit( ExpList expList, int level ) {
         while( expList != null ) {
             if(expList.head != null){
@@ -27,6 +149,14 @@ public class SemanticAnalyzer implements AbsynVisitor{
     }
 
     public void visit( AssignExp exp, int level ) {
+        int lhsType = type(exp.lhs);
+        int rhsType = expType(exp.rhs);
+        
+        if(lhsType != rhsType)
+        {
+            System.err.println("Line " + (exp.row+1) +": Assignment type error. Cannot assign type " + rhsType + " to type " + lhsType);
+        }
+
         if(exp.lhs != null)
             exp.lhs.accept( this, level );
         if(exp.rhs != null)
@@ -58,28 +188,10 @@ public class SemanticAnalyzer implements AbsynVisitor{
                 
                 if(declarations.get(key).get(0).level == level)
                 {
-                    if(declarations.get(key).get(0).def instanceof SimpleDec)
-                    {
-                        SimpleDec simpleNode = (SimpleDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(simpleNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + simpleNode.typ.getType() + "\n");
-                    }
-                    else if(declarations.get(key).get(0).def instanceof ArrayDec)
-                    {
-                        ArrayDec arrayNode = (ArrayDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(arrayNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + arrayNode.typ.getType() + "\n");
-                    }
-                    else if(declarations.get(key).get(0).def instanceof FunctionDec)
-                    {
-                        FunctionDec functionNode = (FunctionDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(functionNode.func + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + functionNode.result.getType() + "\n");
-                    }
+                    printDec(level, key);
                     
                     if(declarations.get(key).size() == 1){
                         toRemove.add(key);
-                        //declarations.remove(key);
                     }
                     else{
                         declarations.get(key).remove(0);
@@ -101,7 +213,34 @@ public class SemanticAnalyzer implements AbsynVisitor{
     public void visit( IntExp exp, int level ) {
     }
 
-    public void visit( OpExp exp, int level ) {        
+    public void visit( OpExp exp, int level ) {   
+        System.out.println("DO I/O THING\n");
+        int lhsType = expType(exp.left);
+        int rhsType = expType(exp.right);
+
+        if(lhsType != rhsType && lhsType != -1)
+        {
+            System.err.println("Line " + (exp.row+1) + ": Operation expression error. Cannot operate on " + rhsType + " with " + lhsType);
+        }
+
+        if(lhsType == rhsType)
+        {
+            if(exp.op <= 10 && lhsType != NameTy.INT)//int operations
+            {
+                System.err.println("Line " + (exp.row+1) + ": Operation expression error. Int type expected for this operation.");
+            }
+            else if(exp.op > 10 && lhsType != NameTy.BOOL){
+                System.err.println("Line " + (exp.row+1) + ": Operation expression error. Bool type expected for this operation.");
+            }
+        }
+        else if(lhsType == -1)
+        {
+            if(exp.op != OpExp.UMINUS && exp.op != OpExp.NOT)
+            {
+                System.err.println("Line " + (exp.row + 1) + ": Operation expression error. Unexpected NilExp on left side");
+            }
+        }
+
         if (exp.left != null)
             exp.left.accept( this, level );
         if(exp.right != null)
@@ -109,13 +248,8 @@ public class SemanticAnalyzer implements AbsynVisitor{
     }
 
     public void visit( VarExp exp, int level ) {
-        //indent( level );
-        //System.out.println( "VarExp: " + exp.variable );
         exp.variable.accept(this, level);
     }
-
-
-    //new ones
 
     public void visit( WhileExp exp, int level ) {
         indent( level );
@@ -138,28 +272,10 @@ public class SemanticAnalyzer implements AbsynVisitor{
                 
                 if(declarations.get(key).get(0).level == level)
                 {
-                    if(declarations.get(key).get(0).def instanceof SimpleDec)
-                    {
-                        SimpleDec simpleNode = (SimpleDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(simpleNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + simpleNode.typ.getType() + "\n");
-                    }
-                    else if(declarations.get(key).get(0).def instanceof ArrayDec)
-                    {
-                        ArrayDec arrayNode = (ArrayDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(arrayNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + arrayNode.typ.getType() + "\n");
-                    }
-                    else if(declarations.get(key).get(0).def instanceof FunctionDec)
-                    {
-                        FunctionDec functionNode = (FunctionDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(functionNode.func + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + functionNode.result.getType() + "\n");
-                    }
+                    printDec(level, key);
 
                     if(declarations.get(key).size() == 1){
                         toRemove.add(key);
-                        //declarations.remove(key);
                     }
                     else{
                         declarations.get(key).remove(0);
@@ -177,22 +293,28 @@ public class SemanticAnalyzer implements AbsynVisitor{
     }
 
     public void visit( ArrayDec exp, int level ) {
-        //myWriter.write( "size: " + exp.size + "\n");
         if(!(declarations.containsKey(exp.name))){
             ArrayList<NodeType> al = new ArrayList<NodeType>();
             al.add(0, new NodeType(exp.name, exp, level));
             declarations.put(exp.name, al);
         }
         else{
-            declarations.get(exp.name).add(0, new NodeType(exp.name, exp, level));
+            if(declarations.get(exp.name).get(0).level == level)
+            {
+                System.err.println("Line " + (exp.row+1) + ": Redefinition error, " + exp.name + " already defined in this scope");
+            }
+            else
+            {
+                declarations.get(exp.name).add(0, new NodeType(exp.name, exp, level));
+            }
         }
-        //level -= 1;
         
         if(exp.typ != null)
             exp.typ.accept( this, level );
     }
     
     public void visit(BoolExp exp, int level){
+        
     }
 
     public void visit(CallExp exp, int level){
@@ -201,8 +323,7 @@ public class SemanticAnalyzer implements AbsynVisitor{
             exp.args.accept(this, level);
     }
 
-    public void visit( CompoundExp exp, int level ) {   
-        //level++;    
+    public void visit( CompoundExp exp, int level ) {      
         if(exp.decs != null)
             exp.decs.accept( this, level );
         if(exp.exps != null)
@@ -232,28 +353,10 @@ public class SemanticAnalyzer implements AbsynVisitor{
 
                 if(declarations.get(key).get(0).level == level)
                 {
-                    if(declarations.get(key).get(0).def instanceof SimpleDec)
-                    {
-                        SimpleDec simpleNode = (SimpleDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(simpleNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + simpleNode.typ.getType() + "\n");
-                    }
-                    else if(declarations.get(key).get(0).def instanceof ArrayDec)
-                    {
-                        ArrayDec arrayNode = (ArrayDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(arrayNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + arrayNode.typ.getType() + "\n");
-                    }
-                    else if(declarations.get(key).get(0).def instanceof FunctionDec)
-                    {
-                        FunctionDec functionNode = (FunctionDec) declarations.get(key).get(0).def;
-                        indent(level);
-                        myWriter.write(functionNode.func + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + functionNode.result.getType() + "\n");
-                    }
+                    printDec(level, key);
                     
                     if(declarations.get(key).size() == 1){
                         toRemove.add(key);
-                        //declarations.remove(key);
                     }
                     else{
                         declarations.get(key).remove(0);
@@ -283,16 +386,22 @@ public class SemanticAnalyzer implements AbsynVisitor{
             System.err.println("FileWrite Error");
         }
 
-        if(declarations.get(exp.func) == null)
-        {
-            ArrayList<NodeType> al = new ArrayList<>();
+        if(!(declarations.containsKey(exp.func))){
+            ArrayList<NodeType> al = new ArrayList<NodeType>();
             al.add(0, new NodeType(exp.func, exp, level));
-            declarations.put(exp.func, al);            
+            declarations.put(exp.func, al);
         }
-        else
-        {
-            System.err.println("Nested function error, shouldn't get here");
+        else{
+            if(declarations.get(exp.func).get(0).level == level)
+            {
+                System.err.println("Redefinition error, " + exp.func + " already defined in this scope");
+            }
+            else
+            {
+                declarations.get(exp.func).add(0, new NodeType(exp.func, exp, level));
+            }
         }
+
         level++;
         if(exp.result != null)
             exp.result.accept( this, level );
@@ -306,29 +415,12 @@ public class SemanticAnalyzer implements AbsynVisitor{
                 List<String> toRemove = new ArrayList<>();
 
                 for (String key : declarations.keySet()) {
-                    System.out.println("key = " + key);
                     if(declarations.get(key).get(0).level == level)
                     {
-                        if(declarations.get(key).get(0).def instanceof SimpleDec)
-                        {
-                            SimpleDec simpleNode = (SimpleDec) declarations.get(key).get(0).def;
-                            indent(level);
-                            myWriter.write(simpleNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + simpleNode.typ.getType() + "\n");
-                        }
-                        else if(declarations.get(key).get(0).def instanceof ArrayDec)
-                        {
-                            ArrayDec arrayNode = (ArrayDec) declarations.get(key).get(0).def;
-                            indent(level);
-                            myWriter.write(arrayNode.name + " x" + declarations.get(key).size() + ", l: " + level + ", t: " + arrayNode.typ.getType() + "\n");
-                        }
-                        else if(declarations.get(key).get(0).def instanceof FunctionDec)
-                        {
-                            System.err.println("ERROR, NO NESTED FUNCTIONS ALLOWED");
-                        }
+                        printDec(level, key);
                         
                         if(declarations.get(key).size() == 1){
                             toRemove.add(key);
-                            //declarations.remove(key);
                         }
                         else{
                             declarations.get(key).remove(0);
@@ -349,7 +441,22 @@ public class SemanticAnalyzer implements AbsynVisitor{
     }
 
     public void visit( IndexVar exp, int level ) {
-        level++;
+
+        if(declarations.containsKey(exp.name))
+        {
+            if(declarations.get(exp.name).get(0).def instanceof ArrayDec)
+            {
+                if(expType(exp.index) != NameTy.INT)
+                {
+                    System.err.println("Line " + (exp.row + 1) + ": Array index is type " + expType(exp.index) + ". Expected INT");
+                }
+            }
+        }
+        else
+        {
+            System.err.println("Line " + (exp.row + 1) + ": Undefined array error. " + exp.name + " does not exist");
+        }
+
         if(exp.index != null)
             exp.index.accept( this, level );
     }
@@ -361,31 +468,22 @@ public class SemanticAnalyzer implements AbsynVisitor{
     }
     
     public void visit( SimpleDec exp, int level ) {
-        //try {
 
-            if(!(declarations.containsKey(exp.name)))
+        if(!(declarations.containsKey(exp.name))){
+            ArrayList<NodeType> al = new ArrayList<NodeType>();
+            al.add(0, new NodeType(exp.name, exp, level));
+            declarations.put(exp.name, al);
+        }
+        else{
+            if(declarations.get(exp.name).get(0).level == level)
             {
-                ArrayList<NodeType> al = new ArrayList<>();
-                al.add(0, new NodeType(exp.name, exp, level));
-                declarations.put(exp.name, al);
-                //indent(level);
-
-                //SimpleDec jane = (SimpleDec) declarations.get(exp.name).get(0).def;
-                //myWriter.write(exp.name + " x" + declarations.get(exp.name).size() + ", l: " + level + ", t: " + jane.typ.getType() + "\n");
-                //myWriter.write(exp.name + " x" + declarations.get(exp.name).size() + ", l: " + level + ", t: " +  + "\n");
+                System.err.println("Line " + (exp.row + 1) + ": Redefinition error, " + exp.name + " already defined in this scope");
             }
             else
             {
                 declarations.get(exp.name).add(0, new NodeType(exp.name, exp, level));
-                //indent(level);
-                //SimpleDec jane = (SimpleDec) declarations.get(exp.name).get(0).def;
-                //myWriter.write(exp.name + " x" + declarations.get(exp.name).size() + ", l: " + level + ", t: " + jane.typ.getType() + "\n");
             }
-        
-        /*} catch (IOException e)
-        {
-            System.err.println("FileWrite Error");
-        }*/
+        }
         level++;
         if(exp.typ != null)
             exp.typ.accept( this, level );
