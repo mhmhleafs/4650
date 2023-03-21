@@ -225,7 +225,7 @@ param_list ::= param_list:p1 COMMA param:p2
 param ::= type_specifier:t ID:i
          {: RESULT = new SimpleDec(tleft, tright, t, i); :}
          | type_specifier:t ID:i LBRACK RBRACK
-         {: RESULT = new SimpleDec(tleft, tright, t, i); :}
+         {: RESULT = new ArrayDec(tleft, tright, t, i, 0); :}
          | type_specifier:t error:e
          {:
             parser.report_error("_Invalid single parameter ID @ row: "+ (tleft + 1) + ", col: " + eright, e);

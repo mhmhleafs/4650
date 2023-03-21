@@ -1,0 +1,6 @@
+Entering the global scope:
+    Entering scope for block main (level 1): 
+    Leaving the scope for block main
+    a : INT
+    main : () -> INT
+Leaving the global scope

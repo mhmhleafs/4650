@@ -1,22 +1,24 @@
-/*
-Error 1: Invalid addition expression (Invalid Expression ON RHS of =)
-Error 2: Invalid addition expression (Invalid RHS of addop "1:")
-*/
+/*  Expected errors (operation types)
 
-void main(void) {
-  int x; 
-  int fac;
-  bool test;
-  test = +; /* error 1 */
+Line 18, cannot assign BOOL to INT
+Line 20, cannot operate on INT with BOOL
+Line 24, array index isn't INT
+ */
 
-  x = input();
-  fac = 1;
-  test = x > 1;
-  while (test) {
-    fac = fac * x;
-    x = x - 1:; /* error 2 */
-    test = x > 1;
-  } 
+int a;
 
-  output(fac);
+void main(void)
+{
+  bool a;
+  int b;
+  int c;
+
+  if(~b)
+
+  c = a;
+
+  if(a < 5)
+  {
+  }
+
 }

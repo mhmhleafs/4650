@@ -1,21 +1,21 @@
-/*
-Error 1: invalid parameter list (invalid parameter syntax)
-Error 2: invalid individual parameter (invalid ID syntax)
-*/
+/*  Expected errors
+Line 9, unexpected array in def'n
+Line 18, array redefinition in same scope
+Line 20, array index not INT
+ */
 
-void main(void main(), int b) { /* error 1 */
-  int x;
-  int fac;
-  x = input();
-  fac = 1;
-  while (x > 1) {
-    fac = fac * x;
-    x = x - 1;
-  }
+ int func(int p);
 
-  output(fac);
-}
+ int func(int e[])
+ {
+  return 1;
+ }
 
-void main2(int main2()){ /* error 2 */
-  int s;
-}
+ void main(void)
+ {
+  int a[5];
+  int c;
+  int a[6];
+
+  c = a[true];
+ }

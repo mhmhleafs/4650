@@ -162,8 +162,8 @@ public class ShowTreeVisitor implements AbsynVisitor {
     try {
       myWriter.write( "ArrayDec: " + exp.name + " " + exp.size + "\n");
     
-} catch (IOException e)
-{
+    } catch (IOException e)
+    {
       System.err.println("FileWrite Error");
     }
     level++;

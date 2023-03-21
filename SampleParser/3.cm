@@ -1,20 +1,15 @@
-/*
-Error 1: Invalid additive expression (Invalid ID "z:")
-Error 2: Invalid assignment operation (Invalid ID "z:z")
-*/
+/*  Expected errors (invalid functions)
+Line 11, calls nonexistent f'n
+Line 12, calls INT as a f'n
+EOF, main is of type INT (should be VOID)
+ */
 
-int gcd(int u, int v) {
-  if (v == 0) return u;
-  else return gcd(v, u - u/v*v);
-}
+int a;
 
-void main(void x) {
-  int x;  
-  z: + y; /* error 1 */
+int main(void)
+{
+  gcd(5);
+  a();
 
-  z:z = 6; /* error 2 */
-
-  x = input();
-  y = input();
-  output(gcd(x, y));
+  return 1;
 }

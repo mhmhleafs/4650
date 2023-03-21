@@ -5,8 +5,6 @@ Entering the global scope:
         a : BOOL
         b : INT
         c : INT
-        d : INT
-        e : INT
     Leaving the scope for block main
     a : INT
     main : () -> VOID
