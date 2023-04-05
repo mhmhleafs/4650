@@ -157,12 +157,12 @@ var_declaration ::= type_specifier:t ID:i SEMI
                | type_specifier:t error:e LBRACK NUM:n RBRACK SEMI
                {:
                   RESULT = new ArrayDec(eleft, eright, t, "", n);
-                  parser.report_error("_Invalid Array Declaration at @ row:"+ (eleft + 1) + ", col:" + eright, e);
+                  parser.report_error("_SYNTAXERR: Invalid Array Declaration at @ row:"+ (eleft + 1) + ", col:" + eright, e);
                :}
                | type_specifier:t error:e SEMI
                {:
                   RESULT = new SimpleDec(eleft, eright, t, "");
-                  parser.report_error("_Invalid Simple Declaration @ row:"+ (eleft + 1) + ", col:" + eright, e);
+                  parser.report_error("_SYNTAXERR: Invalid Simple Declaration @ row:"+ (eleft + 1) + ", col:" + eright, e);
                :}
                ;
 
@@ -180,7 +180,7 @@ fun_declaration ::= type_specifier:t ID:i LPAREN params:p RPAREN compound_stmt:c
                :}
                | error:e ID:i LPAREN params:p RPAREN compound_stmt:c
                {:
-                  parser.report_error("_Invalid Function Type Declaration at @ row:"+ (ileft + 1) + ", col:" + iright, e);
+                  parser.report_error("_SYNTAXERR: Invalid Function Type Declaration at @ row:"+ (ileft + 1) + ", col:" + iright, e);
                   RESULT = new FunctionDec(eleft, eright, new NameTy(cleft, eright, NameTy.ERROR), i, p, c);
                :}
                ;
@@ -189,7 +189,7 @@ fun_prototype ::= type_specifier:t ID:i LPAREN params:p RPAREN SEMI
                {: RESULT = new FunctionDec(tleft, tright, t, i, p, new NilExp(tleft, tright)); :}
                | error:e ID:i LPAREN params:p RPAREN SEMI
                {: 
-               parser.report_error("_Invalid type on function_prototype @ row: "+ (ileft + 1) + ", col: " + eright, e);
+               parser.report_error("_SYNTAXERR: Invalid type on function_prototype @ row: "+ (ileft + 1) + ", col: " + eright, e);
                RESULT = new FunctionDec(eleft, eright, new NameTy(eleft, eright, NameTy.ERROR), i, p, new NilExp(eleft, eright)); :}
                ;
 
@@ -213,7 +213,7 @@ param_list ::= param_list:p1 COMMA param:p2
                :}
                | error:e COMMA param:p2
                {:
-                  parser.report_error("_Invalid parameter list @ row: "+ (p2left + 1) + ", col: " + eright, e);
+                  parser.report_error("_SYNTAXERR: Invalid parameter list @ row: "+ (p2left + 1) + ", col: " + eright, e);
                   SimpleDec t = new SimpleDec(eleft, eright, new NameTy(eleft, eright, NameTy.ERROR), "ERROR");
                   
                   RESULT = new VarDecList(t, null);
@@ -228,12 +228,12 @@ param ::= type_specifier:t ID:i
          {: RESULT = new ArrayDec(tleft, tright, t, i, 0); :}
          | type_specifier:t error:e
          {:
-            parser.report_error("_Invalid single parameter ID @ row: "+ (tleft + 1) + ", col: " + eright, e);
+            parser.report_error("_SYNTAXERR: Invalid single parameter ID @ row: "+ (tleft + 1) + ", col: " + eright, e);
             RESULT = new SimpleDec(tleft, tright, t, "ERROR");
          :}
          | error:e ID:i
          {:
-            parser.report_error("_Invalid single parameter type @ row: "+ (ileft + 1) + ", col: " + iright, e);
+            parser.report_error("_SYNTAXERR: Invalid single parameter type @ row: "+ (ileft + 1) + ", col: " + iright, e);
             RESULT = new SimpleDec(ileft, iright, new NameTy(eleft, eright, NameTy.ERROR), i);
          :}
          ;
@@ -323,12 +323,12 @@ expression ::= var:v EQ expression:e
             {: RESULT = o; :}
             | var:v EQ error:e
             {:
-               parser.report_error("_Invalid expression on RHS of '=' @ row: "+ (vleft + 1) + ", col: " + eright, e);
+               parser.report_error("_SYNTAXERR: Invalid expression on RHS of '=' @ row: "+ (vleft + 1) + ", col: " + eright, e);
                VarExp t = new VarExp(vleft, vright, v);
                RESULT = new AssignExp(vleft, vright, t, new NilExp(eleft, eright));
             :}
             | error:e1 EQ expression:e2
-            {: parser.report_error("_Invalid expression on LHS of '=' @ row: "+ (e2left + 1) + ", col: " + e1right, e1);
+            {: parser.report_error("_SYNTAXERR: Invalid expression on LHS of '=' @ row: "+ (e2left + 1) + ", col: " + e1right, e1);
                SimpleVar v = new SimpleVar(e1left, e1right, "ID_ERROR");
                VarExp t = new VarExp(e1left, e1right, v);
                RESULT = new AssignExp(e1left, e1right, t, e2);
@@ -396,12 +396,12 @@ additive_expression ::= additive_expression:a1 addop:a2 term:t
             {: RESULT = t; :}
             | error:e addop:a2 term:t
             {:
-               parser.report_error("_Invalid additive expression on LHS of '+/-' @ row: "+ (tleft + 1) + ", col: " + tright, e);
+               parser.report_error("_SYNTAXERR: Invalid additive expression on LHS of '+/-' @ row: "+ (tleft + 1) + ", col: " + tright, e);
                RESULT = new OpExp(eleft, eright, new NilExp(eleft, eright), a2, t);
             :}
             | additive_expression:a1 addop:a2 error:e
             {: 
-               parser.report_error("_Invalid term on RHS of '+/-' @ row: "+ (a1left + 1) + ", col: " + a1right, e);
+               parser.report_error("_SYNTAXERR: Invalid term on RHS of '+/-' @ row: "+ (a1left + 1) + ", col: " + a1right, e);
                RESULT = new OpExp(eleft, eright, a1, a2, new NilExp(eleft, eright));
             :}
             ;

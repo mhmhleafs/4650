@@ -1,0 +1,41 @@
+/*  Expected errors
+line 23, invalid nilexp on LHS
+line 29, invalid argument type(s) for func(int)
+line 30, too many arguments for output(int)
+line 31, too few arguments for output(int)
+line 34, redefinition of func
+line 37, redefinition of c
+line 38, invalid return in func
+EOF, func (second one) has no valid return
+EOF, function prototype bar is never defined
+EOF, expected main to be last function
+
+
+
+
+*/
+void foo(void){}
+
+void bar(void);
+
+int func(int p)
+{
+  int c;
+
+  c = +6; 
+  return 6;
+}
+
+void main(void) {
+int x;
+if( x ) func(foo());
+if(foo()) output(x, foo);
+output();
+}
+
+int func(void)
+{
+  int c;
+  bool c;
+  return true;
+}

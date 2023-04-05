@@ -1,0 +1,19 @@
+/* Expected errors:
+Line 13, syntax error
+ */
+
+int f(int size) {
+  void i;
+  int c;
+  {
+    bool i;
+    {
+      *;
+    }
+  }
+  return 2;
+}
+
+void main(void)
+{
+}

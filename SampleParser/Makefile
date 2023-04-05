@@ -22,4 +22,4 @@ parser.java: tinyBare.cup
 	$(CUP) -expect 3 tinyBare.cup
 
 clean:
-	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *.abs *~
+	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *.abs *.tm *.sym *~

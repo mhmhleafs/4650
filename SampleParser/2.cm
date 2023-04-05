@@ -1,24 +1,4 @@
-/*  Expected errors (operation types)
-
-Line 18, cannot assign BOOL to INT
-Line 20, cannot operate on INT with BOOL
-Line 24, array index isn't INT
- */
-
-int a;
-
 void main(void)
 {
-  bool a;
-  int b;
-  int c;
-
-  if(~b)
-
-  c = a;
-
-  if(a < 5)
-  {
-  }
-
+  
 }

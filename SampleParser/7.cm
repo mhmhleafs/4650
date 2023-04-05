@@ -1,0 +1,46 @@
+/* Expected errors:
+Line 19, syntax error
+EOF, function prototype for func2 never defined
+EOF, function func2 has no return, expects int
+ */
+
+int i;
+int j;
+bool e;
+
+int func(int p, int l)
+{
+  int a[10];
+  return a[5];
+}
+
+int func2(int s[]);
+
+int f(crint size) {
+  void i;
+  int c;
+  {
+    bool i;
+    {
+      bool j;
+    }
+  }
+  c = input();
+  output(2);
+
+  while(e || false && ~e)
+  {
+    int p;
+
+    if(c + 2 > c)
+    {
+      bool s;
+    }
+  }
+
+  return 2;
+}
+
+void main(void)
+{
+}
