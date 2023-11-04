@@ -9,17 +9,17 @@ CUP=cup
 
 all: Main.class
 
-Main.class: absyn/*.java parser.java sym.java Lexer.java ShowTreeVisitor.java Scanner.java Main.java
+Main.class: absyn/*.java parser.java sym.java Lexer.java SemanticAnalyzer.java NodeType.java ShowTreeVisitor.java Scanner.java Main.java
 
 %.class: %.java
 	$(JAVAC) $(CLASSPATH) $^
 
-Lexer.java: tiny.flex
-	$(JFLEX) tiny.flex
+Lexer.java: M1.flex
+	$(JFLEX) M1.flex
 
-parser.java: tiny.cup
-	#$(CUP) -dump -expect 3 tiny.cup
-	$(CUP) -expect 3 tiny.cup
+parser.java: tinyBare.cup
+	#$(CUP) -dump -expect 3 tinyBare.cup
+	$(CUP) -expect 3 tinyBare.cup
 
 clean:
-	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *~
+	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *.abs *.tm *.sym *~

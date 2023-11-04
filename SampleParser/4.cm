@@ -1,0 +1,21 @@
+/*  Expected errors
+Line 9, unexpected array in def'n
+Line 18, array redefinition in same scope
+Line 20, array index not INT
+ */
+
+ int func(int p);
+
+ int func(int e[])
+ {
+  return 1;
+ }
+
+ void main(void)
+ {
+  int a[5];
+  int c;
+  int a[6];
+
+  c = a[true];
+ }

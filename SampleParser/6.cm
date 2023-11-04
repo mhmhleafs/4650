@@ -1,0 +1,15 @@
+/*  Expected errors (invalid functions)
+Line 11, calls nonexistent f'n
+Line 12, calls INT as a f'n
+EOF, main is of type INT (should be VOID)
+ */
+
+int a;
+
+int main(void)
+{
+  gcd(5);
+  a();
+
+  return 1;
+}

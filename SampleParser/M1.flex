@@ -89,6 +89,8 @@ identifier = [_a-zA-Z][_a-zA-Z0-9]*
 
 truth = false|true
 
+comment = ((\/\*)([^\*\/]|{WhiteSpace})*(\*\/))
+
 %%
 /* ------------------------Lexical Rules Section---------------------- */
 
@@ -104,9 +106,6 @@ truth = false|true
 "return"           { return symbol(sym.RETURN); }
 "void"             { return symbol(sym.VOID); }
 "while"            { return symbol(sym.WHILE); }
-"true"             { return symbol(sym.TRUE); }
-"false"            { return symbol(sym.FALSE); }
-":="               { return symbol(sym.ASSIGN); }
 "="                { return symbol(sym.EQ); }
 "<"                { return symbol(sym.LT); }
 ">"                { return symbol(sym.GT); }
@@ -129,9 +128,9 @@ truth = false|true
 "||"               { return symbol(sym.OR); }
 "&&"               { return symbol(sym.AND); }
 ","                { return symbol(sym.COMMA); }
-{number}           { return symbol(sym.NUM, yytext()); }
+{number}           { return symbol(sym.NUM, Integer.parseInt(yytext())); }
+{truth}            { return symbol(sym.TRUTH, Boolean.parseBoolean(yytext())); }
 {identifier}       { return symbol(sym.ID, yytext()); }
-{truth}            { return symbol(sym.TRUTH, yytext()); }
 {WhiteSpace}+      { /* skip whitespace */ }
-""       { /* skip comments */ }
+{comment}          { /*return symbol(sym.COM, yytext());*/ }
 .                  { return symbol(sym.ERROR); }

@@ -1,0 +1,44 @@
+int i;
+int j;
+bool e;
+
+int func(int p, int l)
+{
+  int a[10];
+  return a[5];
+}
+
+int func2(int s[]);
+
+int f(int size) {
+  void i;
+  int c;
+  {
+    bool i;
+    {
+      bool j;
+    }
+  }
+  c = input();
+  output(2);
+
+  while(e || false && ~e)
+  {
+    int p;
+
+    if(c + 2 > c)
+    {
+      bool s;
+    }
+  }
+}
+
+int func2(int s[])
+{
+  return 2;
+}
+
+void main(void)
+{
+  return;
+}
